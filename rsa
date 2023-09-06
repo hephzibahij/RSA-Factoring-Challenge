@@ -1,5 +1,70 @@
-#!/usr/bin/env bash
-# Factorize as many numbers as possible into a product of two smaller numbers.
+#!/usr/bin/python3
 
-gcc factors.c -o a
-./a $1
+import sys
+import time
+
+# Function to check if a number is prime
+def is_prime(n):
+    '''
+    Checks if a number is prime.
+
+    Args:
+        n (int): The number to check.
+
+    Returns:
+        bool: True if the number is prime, False otherwise.
+    '''
+    if n < 2:
+        return False
+    for i in range(2, int(n**0.5) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+# Function to find prime factors p and q of n
+def factorize_rsa(n):
+    '''
+    Finds prime factors p and q of an RSA number n.
+
+    Args:
+        n (int): The RSA number to factorize.
+
+    Returns:
+        tuple or None: A tuple (p, q) if prime factors are found, None otherwise.
+    '''
+    for p in range(2, int(n**0.5) + 1):
+        if n % p == 0 and is_prime(p):
+            q = n // p
+            if is_prime(q):
+                return (p, q)
+    return None
+
+# Check for the correct number of command line arguments
+if len(sys.argv) != 2:
+    print("Usage: rsa <file>")
+    exit()
+
+# Read the input file name from the command line arguments
+input_file = sys.argv[1]
+
+try:
+    with open(input_file, 'r') as f:
+        n = int(f.readline().strip())
+except FileNotFoundError:
+    print("File not found")
+    exit()
+
+start_time = time.time()
+
+# Find prime factors p and q of n
+factors = factorize_rsa(n)
+
+if factors:
+    p, q = factors
+    print(f"{n}={p}*{q}")
+else:
+    print("Unable to find prime factors")
+
+# Check if the elapsed time exceeds 5 seconds
+if time.time() - start_time > 5:
+    print("Time limit exceeded")
